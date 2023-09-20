@@ -75,9 +75,9 @@ const createArray = (length) => {
  
     return result
 }
-// arrow function to add data in html
+// using arrow fxn to add data in html file
 const createHtml = (data) => {
-    // days and weeks in a for loop
+    // days and weeks in for loop
       let result = ''
      for (const {week, days} of data ) {
         let inner = ""
@@ -89,7 +89,7 @@ const createHtml = (data) => {
             const isAlternate = week % 2 === 0
             
 			let classString = 'table__cell'
-            // replace outcome in <tr></tr>
+            // replace outcome in <tr></tr> html
             if (isToday){classString = `${classString} table__cell_today`}
             if (isWeekend){ classString = `${classString} table__cell_weekend`}
             if (isAlternate){classString = `${classString} table__cell_alternate`}
