@@ -1,5 +1,3 @@
-
-
 const MONTHS = [
     'January',
     'February',
@@ -19,97 +17,116 @@ const getDaysInMonth = (date) => new Date(date.getFullYear(), date.getMonth() + 
 
 // Only edit below 
 
+/**
+ * Function that creates an empty array of the given length parameter
+ * to be filled later.
+ * @param {Number} length 
+ * @returns Array named result
+ */
 const createArray = (length) => {
-    const result = []
+    const newArray = []
 
-    for (let i =0; i <length; i++) {
-        result.push(i)
+    for (let i = 0; i < length; i++) {
+        newArray[i] = null
     }
-
-    return result
+    return newArray
 }
-// makes create day and weeks fxns
-  const createData = () => {
-    // new date
-     const current = new Date()
-     current.setDate(1)
-    // current date
-    const startDay = current.getDay()
-    // current date in the month
-    const daysInMonth = getDaysInMonth(current)
-    // weeks array
-    const weeks = createArray(5)
-    // days array
-    const days = createArray(7)
-    const result = []
 
-   for (const weekIndex of weeks) {
-        result.push({
-            week: weekIndex + 1,
-            days: []
-        })
+const createData = () => {
 
-         for (const dayIndex  of days ) {
-            
-           const day = (dayIndex - startDay) + (weekIndex * 7 ) +1
-           
-            const isValid = day > 0 && day <= daysInMonth
+    let weeks = createArray(5)
 
-            result[weekIndex].days.push({
-                dayOfWeek: dayIndex + 1,
-                value: isValid ? day : '',
-            })
-        }
+    /* for loop to create the text inside the week column cells
+    and add them to the weeks array and the number of rows for
+    the weeks column */
+    for (const [index, singleWeek] of weeks.entries()) {
+        weeks[index] = `Week ${index + 1}`
+    };
+
+    return weeks;
+};
+
+
+const addCell = () => {
+    // created a single row with 8 columns
+    const newRow = document.createElement('tr');
+
+    /* for loop to repeat the addition of a new cell to the row */
+    for (let i = 0; i < 8; i++) {
+        const newCell = document.createElement('td');
+        // added attribute to cells
+        newCell.setAttribute("class", "table__cell");
+        newRow.appendChild(newCell);
     }
+    return newRow
+};
 
-    return result
-}
-// arrow function to add new date in cell
- const addCell = (existing, classString, value) => {
-   const result = /* html */ `
-        ${existing}
-        <td class="${classString}">
-             &nbsp;${value}&nbsp;
-        </td>
-        `
- 
-    return result
-}
-// using arrow fxn to add data in html file
+
 const createHtml = (data) => {
-    // days and weeks in for loop
-      let result = ''
-     for (const {week, days} of data ) {
-        let inner = ""
-        inner = addCell(inner, 'table__cell table__cell_sidebar', `Week ${week}`)
-        // day of the week , value of days in a loop = truthly
-        for (const { dayOfWeek, value } of days) {
-            const isToday = new Date().getDate() === value
-            const isWeekend = dayOfWeek === 0 || dayOfWeek === 6
-            const isAlternate = week % 2 === 0
-            
-			let classString = 'table__cell'
-            // replace outcome in <tr></tr> html
-            if (isToday){classString = `${classString} table__cell_today`}
-            if (isWeekend){ classString = `${classString} table__cell_weekend`}
-            if (isAlternate){classString = `${classString} table__cell_alternate`}
-            inner = addCell(inner,classString, value)
-        }
-        // add inner results 
-        result = `
-            ${result}
-            <tr>${inner}</tr>
-        `
+
+    const tbody = document.createElement('tbody');
+  
+    /* create for loop to use the addCell function 5 times
+    to make 5 rows - started index from one for readability*/
+    for (let i = 1; i < 6; i++) {
+      tbody.appendChild(addCell())
     }
-    // return results
-    return result;
-}
+  
+    //for loop to add the week text to the first cell of each row
+    const rows = tbody.querySelectorAll('tr');
+    const currentDay = new Date('29 april 2023')
+    const daysInMonth = getDaysInMonth(currentDay)
+  
+    for (let i = 1; i < 6; i++) {
+      //fetch all the first cells of each row
+      const weekCells = rows[i-1].querySelectorAll('td');
+      weekCells[0].classList.add('table__cell_sidebar')
+      weekCells[0].innerHTML = data[i - 1];
+  
+      for (let x = 1; x < 8; x++) {
+        let day = x+1
+        weekCells[x].innerHTML = day
+  
+        //used to add light color to the weekends
+        if (x === 1 || x === 7) {
+            weekCells[x].classList.add('table__cell_weekend')
+        }
+        /* populate day cells with the month days */
+        if(i === 2 && day < daysInMonth) {
+            day +=7
+            weekCells[x].innerHTML = day
+            weekCells[x].classList.add('table__cell_alternate')
+        } else if (i === 3 && day < daysInMonth) {
+            day +=14
+            weekCells[x].innerHTML = day
+        } else if (i === 4 && day < daysInMonth) {
+            day +=21
+            weekCells[x].innerHTML = day
+            weekCells[x].classList.add('table__cell_alternate')
+        } else if (i === 5 && day < daysInMonth) {
+            day +=28
+            weekCells[x].innerHTML = day
+            if (day === daysInMonth) break;
+        }
+        //used to mark the current day
+        if (day === currentDay.getDate()) {
+            weekCells[x].classList.remove('table__cell_weekend');
+          weekCells[x].classList.add('table__cell_today')
+        }
+      }
+    }
+  
+    // add the body to the table
+    const table = document.createElement('table');
+    table.appendChild(tbody);
+  
+    return table.outerHTML;
+  };
 
-//  Only edit above
+// Only edit above
 
-
-const current = new Date()
+const current = new Date('29 april 2023')
 document.querySelector('[data-title]').innerText = `${MONTHS[current.getMonth()]} ${current.getFullYear()}`
 
 const data = createData()
-document.querySelector('[data-content]').innerHTML = createHtml(data)
+document.querySelector('[data-content]').innerHTML = createHtml(data);
